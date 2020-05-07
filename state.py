@@ -13,7 +13,6 @@ import const
 
 class State:
     def __init__(self, players=None, state=None):
-        self.players = players
         self.turn = 0
         self.player_turn = 0
         self.player_pieces = []
@@ -24,6 +23,8 @@ class State:
         self.last_action_details = []
 
         if state is None:
+            self.players = players
+            self.player_turn = random.randint(0,players)
             self.set_starting_board()
             self.shuffle_deck()
             self.player_cards = [[] for _ in range(players)]

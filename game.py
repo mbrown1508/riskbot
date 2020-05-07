@@ -33,12 +33,12 @@ class RiskGame:
     # Draw card
     # Next Player
 
+    def current_player(self):
+        return self.state.player_turn
+
     def action(self, data):
-        print(data)
-        if data[0] == const.CREATE_GAME:
-            return self.create_game(data[1])
-        else:
-            return []
+        # currently returns the current players data
+        return self.state.player_state(self.current_player())
 
     def create_game(self, players):
         self.state = State(players=players)
@@ -90,3 +90,6 @@ class RiskGame:
         self.state.generate_armies(player, total, territories, castles, regions)
 
         return const.SUCCESS, self.state.player_state(player)
+
+
+

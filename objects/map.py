@@ -5,7 +5,7 @@ class Map:
     def __init__(self, screen):
         self.screen = screen
 
-        self.map_surface = pygame.image.load('risk-board.jpg')
+        self.map_surface = pygame.image.load('images/risk-board.jpg')
         self.map_x, self.map_y = 10000, 14880
 
         self.cached_scaled_map = {}
