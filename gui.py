@@ -2,15 +2,16 @@ import pygame
 
 import const
 
-from queue import Queue
+from queue import Queue, Empty
 
 from game_thread import GameThread
 from ai_thread import AiThread
 from player import Player, MockQueue
 from ai import Ai
 from state import State
+from objects.button import Button
 
-from territory_data import TERRITORY_DATA
+from const_ui import TERRITORY_DATA
 from objects.territory import Territory
 from objects.map import Map
 from gui_scaler import GuiScaler
@@ -18,9 +19,10 @@ from fontloader import FontLoader
 
 
 class Gui:
-    def __init__(self, screen, player_input, player_count, ai_count):
+    def __init__(self, screen, player_input, font_loader, player_count, ai_count):
         self.screen = screen
         self.player_input = player_input
+        self.font_loader = font_loader
         self.player_count = player_count
         self.ai_count = ai_count
 
@@ -49,6 +51,11 @@ class Gui:
         # Objects
         self.map = Map(self.screen)
         self.territorys = [Territory(self.screen, x['name'], x['coords'], x['center'], p[0], p[1], self.font_loader) for x, p in zip(TERRITORY_DATA, self.game_state.player_pieces)]
+        self.buttons = [
+            Button(screen, font_loader, 200, 0, 300, 50, value='Generate Armies', method=None)
+        ]
+
+        self.set_new_game_state()
 
     def create_game(self):
         # Create the Queues
@@ -75,6 +82,44 @@ class Gui:
         state = self.game_to_ui_queue.get()
         self.game_state = State(state=state)
 
+    def draw_ui(self):
+        # Draw the ui that always has to be drawn
+
+        self.show_player_ui()
+
+    def show_player_ui(self):
+        # Show ui specific to the player
+        for button in self.buttons:
+            button.draw()
+
+    def handle_button_presses(self, point):
+        for button in self.buttons:
+            if not button.hidden and not button.hidden:
+                if button.collide(point):
+                    if button.value == 'Generate Armies':
+                        self.generate_armies()
+
+    # Generate Armies
+    def generate_armies(self):
+        pass
+
+    def update_ui_after_state(self):
+        last_state_update = self.game_state
+
+    def set_new_game_state(self):
+        if self.players[self.game_state.player_turn].type == 'player':
+            for button in self.buttons:
+                if button.value == 'Generate Armies':
+                    button.enable()
+                    button.unhide()
+                else:
+                    button.disable()
+                    button.hide()
+        else:
+            for button in self.buttons:
+                button.disable()
+                button.hide()
+
     def handle_inputs(self, inputs):
         # Handle KEYDOWN
         if inputs['equals']:
@@ -83,7 +128,7 @@ class Gui:
             self.scaler.scale_down()
         if inputs['up']:
             self.scaler.y_down()
-        if  inputs['down']:
+        if inputs['down']:
             self.scaler.y_up()
         if inputs['right']:
             self.scaler.x_up()
@@ -94,7 +139,7 @@ class Gui:
         if inputs['mouse_button_up']:
             pos = inputs['mouse_pos']
 
-            print(self.scaler.scale_point(pos))
+            # print(self.scaler.scale_point(pos))
 
             if self.game_state is not None:
                 for territory in self.territorys:
@@ -102,9 +147,21 @@ class Gui:
                         # print('Territory Clicked: {}'.format(territory.name))
                         territory.select()
 
+    def get_state_update(self):
+        try:
+            state = self.game_to_ui_queue.get(block=False)
+            self.game_state = State(state=state)
+            return True
+        except Empty:
+            return False
+
     def loop(self, dt):
         # Get the map scaling
         self.scale, self.x_mod, self.y_mod = self.scaler.get_scalers()
+
+        # Update game state if it exists
+        if self.get_state_update():
+            self.update_ui_after_state()
 
         # Handle Player Inputs
         inputs = self.player_input.get_inputs()
@@ -118,7 +175,8 @@ class Gui:
         for territory in self.territorys:
             territory.draw(self.scale, self.x_mod, self.y_mod)
 
+        self.draw_ui()
+
         pygame.display.flip()
 
         return const.CONTINUE, None
-

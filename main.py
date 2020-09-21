@@ -5,6 +5,7 @@ from playerinput import PlayerInput
 from logoscreen import LogoScreen
 from start_game_screen import StartGameScreen
 from gui import Gui
+from fontloader import FontLoader
 
 pygame.init()
 
@@ -19,6 +20,9 @@ if depth == 0:
 screen = pygame.display.set_mode((x, y), pygame.FULLSCREEN, depth)
 pygame.display.set_caption("Risk : Game of Thrones")
 
+font_loader = FontLoader()
+
+
 player_input = PlayerInput()
 active = LogoScreen(screen, player_input)
 
@@ -32,8 +36,8 @@ while run:
     if result == const.EXIT:
         run = False
     elif result == const.LOAD_GAME_SELECT:
-        active = StartGameScreen(screen, player_input)
+        active = StartGameScreen(screen, player_input, font_loader)
     elif result == const.LOAD_GAME_GUI:
-        active = Gui(screen, player_input, 3, 2)
+        active = Gui(screen, player_input, font_loader, args[0], args[1])
 
 pygame.quit()

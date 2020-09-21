@@ -2,13 +2,21 @@ import pygame
 
 
 class FontLoader:
-    def __init__(self):
+    def __init__(self, pre_cache=True):
         self.cached_fonts = {}
         self.cached_text = {}
 
         self.font_preferences = [
             "Open Sans",
         ]
+
+        if pre_cache:
+            self.pre_cache()
+
+    def pre_cache(self):
+        # Takes a long time due to this, it was resolved by updating the lib
+        # https://github.com/pygame/pygame/issues/344
+        pygame.font.get_fonts()
 
     def make_font(self, fonts, size):
         available = pygame.font.get_fonts()

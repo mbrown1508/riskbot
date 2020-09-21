@@ -31,7 +31,7 @@ class Territory:
     def draw(self, scale, x_mod, y_mod):
         points = [(x/scale+x_mod, y/scale+y_mod) for x,y in self.points]
         if self.selected:
-            pygame.draw.lines(self.screen, (255, 255, 255), True, points, 3)
+            pygame.draw.lines(self.screen, const.PLAYER_COLOURS[self.owner], True, points, 3)
 
         self.draw_armies(scale, x_mod, y_mod)
 

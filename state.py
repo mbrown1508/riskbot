@@ -24,7 +24,7 @@ class State:
 
         if state is None:
             self.players = players
-            self.player_turn = random.randint(0,players)
+            self.player_turn = random.randint(0, players-1)
             self.set_starting_board()
             self.shuffle_deck()
             self.player_cards = [[] for _ in range(players)]
@@ -124,7 +124,10 @@ class State:
     def set_starting_board(self):
         # All cards are dealt out in 3-6 players
         # 2 individual armies on each territory
-        if self.players == 3:
+        if self.players == 2:
+            self.player_pieces = [[0, 2] for _ in range(const.TOTAL_LOCATIONS//2)] + \
+                                 [[1, 2] for _ in range(const.TOTAL_LOCATIONS//2)]
+        elif self.players == 3:
             self.player_pieces = [[0, 2] for _ in range(const.TOTAL_LOCATIONS//3)] + \
                                  [[1, 2] for _ in range(const.TOTAL_LOCATIONS//3)] + \
                                  [[2, 2] for _ in range(const.TOTAL_LOCATIONS//3)]
