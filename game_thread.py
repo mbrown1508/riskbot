@@ -17,9 +17,11 @@ class GameWorker(threading.Thread):
 
         for x, queue in enumerate(self.game_to_player_queues):
             base_state = self.risk_game.state.player_state(x)
+            # This is the game init
             base_state.append(x)
             queue.put(base_state)
 
+        # This is only needed when we want to observe the bots
         self.game_to_ui_queue.put(self.risk_game.state.game_state())
 
     def run(self):

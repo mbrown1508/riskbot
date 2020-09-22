@@ -4,7 +4,7 @@ from fontloader import FontLoader
 
 
 class Button:
-    def __init__(self, screen, font_loader, x, y, width, height, key=None, value=None, method=None):
+    def __init__(self, screen, font_loader, x, y, width, height, key=None, value=None, method=None, scale=5):
         self.screen = screen
         self.font_loader = font_loader
 
@@ -12,9 +12,12 @@ class Button:
         self.y = y
         self.width = width
         self.height = height
+
         self.key = key
         self.value = value
         self.method = method
+        self.pressed = False
+        self.pressed_last_round = False
 
         self.font_size = int(self.height / 1.4)
         self.modifier = self.font_size//16
@@ -29,9 +32,27 @@ class Button:
         self.enabled = False
         self.hidden = False
 
-        self.rectangle = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.mod_x = None
+        self.mod_y = None
+        self.mod_width = None
+        self.mod_height = None
+        self.rectangle = None
+        self.rescale(scale)
 
-    def draw(self):
+    def rescale(self, scale):
+        self.mod_x = self.x / scale
+        self.mod_y = self.y / scale
+        self.mod_width = self.width / scale
+        self.mod_height = self.height / scale
+
+        self.rectangle = pygame.Rect(self.mod_x, self.mod_y, self.mod_width, self.mod_height)
+
+        self.font_size = int(self.mod_height / 1.4)
+        self.modifier = self.font_size//16
+
+    def draw(self, scale):
+        self.rescale(scale)
+
         if self.enabled:
             pygame.draw.rect(self.screen, self.enabled_fill, self.rectangle, 0)
             pygame.draw.rect(self.screen, self.enabled_outline, self.rectangle, 3)
@@ -41,7 +62,7 @@ class Button:
         else:
             return
 
-        center = (self.x + self.width//2, self.y + self.height//2)
+        center = (self.mod_x + self.mod_width//2, self.mod_y + self.mod_height//2)
 
         text = self.font_loader.create_text(str(self.value), self.font_size, self.font_colour)
         text_x, text_y = text.get_size()

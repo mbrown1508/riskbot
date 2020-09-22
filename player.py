@@ -11,7 +11,8 @@ class MockQueue:
 
 
 class Player:
-    def __init__(self, player_to_game_queue):
+    def __init__(self, player_to_game_queue, name):
         self.type = 'player'
+        self.name = name
 
         self.player_to_game_queue = player_to_game_queue

@@ -12,7 +12,11 @@ class Territory:
         self.pieces = pieces
         self.font_loader = font_loader
 
+        self.pressed = False
+        self.pressed_last_round = False
+
         self.selected = True
+        self.highlighted = False
 
         x_points = [x[0] for x in points]
         y_points = [x[1] for x in points]
@@ -30,8 +34,11 @@ class Territory:
 
     def draw(self, scale, x_mod, y_mod):
         points = [(x/scale+x_mod, y/scale+y_mod) for x,y in self.points]
+        line_width = 3
+        if self.highlighted:
+            line_width = 6
         if self.selected:
-            pygame.draw.lines(self.screen, const.PLAYER_COLOURS[self.owner], True, points, 3)
+            pygame.draw.lines(self.screen, const.PLAYER_COLOURS[self.owner], True, points, line_width)
 
         self.draw_armies(scale, x_mod, y_mod)
 
@@ -49,6 +56,9 @@ class Territory:
 
     def select(self):
         self.selected = not self.selected
+
+    def highlight(self):
+        self.highlighted = not self.highlighted
 
     def collide(self, point, scale, x_mod, y_mod):
         self.rectangle = pygame.Rect(self.x/scale+x_mod, self.y/scale+y_mod, self.width/scale, self.height/scale)

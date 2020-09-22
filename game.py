@@ -90,6 +90,3 @@ class RiskGame:
         self.state.generate_armies(player, total, territories, castles, regions)
 
         return const.SUCCESS, self.state.player_state(player)
-
-
-

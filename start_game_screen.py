@@ -206,7 +206,7 @@ class StartGameScreen:
 
         self.player_count_select.draw()
         self.ai_count_select.draw()
-        self.start_button.draw()
+        self.start_button.draw(scale=1)
 
         self.screen.blit(self.title, (self.title_x, self.title_y))
 

@@ -42,6 +42,24 @@ PLAYER_COLOURS = [
     (156, 146, 3)
 ]
 
+PLAYER_NAMES = [
+    'Matt',
+    'Mary',
+    'Sam',
+    'Gary',
+    'Lisa',
+    'Bart'
+]
+
+AI_NAMES = [
+    'Tardis',
+    'Elysium',
+    'Reaper',
+    'Enterprise',
+    'Falcon',
+    'Serenity'
+]
+
 PLAYER_COLOUR_NAMES = [
     'Blue',
     'Green',

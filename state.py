@@ -21,6 +21,7 @@ class State:
         self.deck = []
         self.last_action = const.NEW_GAME
         self.last_action_details = []
+        self.state_type = None
 
         if state is None:
             self.players = players
@@ -29,8 +30,32 @@ class State:
             self.shuffle_deck()
             self.player_cards = [[] for _ in range(players)]
             self.player_card_counts = [0 for _ in range(self.players)]
+            self.state_type = const.GAME_STATE
         else:
             self.set_state(state)
+
+    def __str__(self):
+        return f"State(state_type={self.state_type_string()}, turn={self.turn}, player_turn={self.player_turn}, last_action={self.last_action_string()}, last_action_details={self.last_action_details})"
+
+    def last_action_string(self):
+        return {
+            const.CARD_AWARDED: "CARD_AWARDED",
+            const.BATTLE_RESULT: "BATTLE_RESULT",
+            const.MOVE_RESULT_BATTLE: "MOVE_RESULT_BATTLE",
+            const.MOVE_RESULT_REINFORCE: "MOVE_RESULT_REINFORCE",
+            const.PLACE_ARMIES: "PLACE_ARMIES",
+            const.CARDS_PLAYED: "CARDS_PLAYED",
+            const.GENERATE_ARMIES: "GENERATE_ARMIES",
+            const.ATTACK_ENDED: "ATTACK_ENDED",
+            const.NEXT_TURN: "NEXT_TURN",
+            const.NEW_GAME: "NEW_GAME",
+        }[self.last_action]
+
+    def state_type_string(self):
+        return {
+            const.PLAYER_STATE: "PLAYER_STATE",
+            const.GAME_STATE: "GAME_STATE"
+        }[self.state_type]
 
     def set_state(self, state):
         # This will set the state based on a list passed to the class
@@ -46,6 +71,7 @@ class State:
             self.player_cards = state[start+1:start+1+card_count]
             self.last_action = state[start+1+card_count]
             self.last_action_details = state[start+1+card_count+1:]
+            self.state_type = const.PLAYER_STATE
 
         elif state[0] == const.GAME_STATE:
             start = const.TOTAL_LOCATIONS*2+4+self.players
@@ -61,6 +87,7 @@ class State:
             start = start+rolling_total+1+card_totals
             self.last_action = state[start]
             self.last_action_details = state[start+1:]
+            self.state_type = const.GAME_STATE
 
     def player_state(self, player_number):
         # This will return the state based in a list that can be used to recreate the class
@@ -100,6 +127,9 @@ class State:
         self.last_action_details = action_details
 
     def game_state(self):
+        if self.state_type == const.PLAYER_STATE:
+            # The player should not be calling this function...
+            return self.player_state(self.player_turn)
         return [const.GAME_STATE, self.players, self.player_turn, self.turn] + \
                [x[0] for x in self.player_pieces] + \
                [x[1] for x in self.player_pieces] + \
@@ -137,11 +167,24 @@ class State:
                                  [[2, 2] for _ in range(const.TOTAL_LOCATIONS // 4)] + \
                                  [[3, 2] for _ in range(const.TOTAL_LOCATIONS // 4)]
         elif self.players == 5:
-            self.player_pieces = [[0, 2] for _ in range(const.TOTAL_LOCATIONS // 5)] + \
-                                 [[1, 2] for _ in range(const.TOTAL_LOCATIONS // 5)] + \
-                                 [[2, 2] for _ in range(const.TOTAL_LOCATIONS // 5+1)] + \
-                                 [[3, 2] for _ in range(const.TOTAL_LOCATIONS // 5+1)] + \
-                                 [[4, 2] for _ in range(const.TOTAL_LOCATIONS // 5+1)]
+            if self.player_turn == 0:
+                a, b, c, d, e = 0, 0, 1, 1, 1
+            elif self.player_turn == 1:
+                a, b, c, d, e = 1, 0, 0, 1, 1
+            elif self.player_turn == 2:
+                a, b, c, d, e = 1, 1, 0, 0, 1
+            elif self.player_turn == 3:
+                a, b, c, d, e = 1, 1, 1, 0, 0
+            elif self.player_turn == 4:
+                a, b, c, d, e = 0, 1, 1, 1, 0
+            else:
+                raise Exception('This could be a problem...')
+
+            self.player_pieces = [[0, 2] for _ in range(const.TOTAL_LOCATIONS // 5+a)] + \
+                                 [[1, 2] for _ in range(const.TOTAL_LOCATIONS // 5+b)] + \
+                                 [[2, 2] for _ in range(const.TOTAL_LOCATIONS // 5+c)] + \
+                                 [[3, 2] for _ in range(const.TOTAL_LOCATIONS // 5+d)] + \
+                                 [[4, 2] for _ in range(const.TOTAL_LOCATIONS // 5+e)]
         elif self.players == 6:
             self.player_pieces = [[0, 2] for _ in range(const.TOTAL_LOCATIONS // 6)] + \
                                  [[1, 2] for _ in range(const.TOTAL_LOCATIONS // 6)] + \

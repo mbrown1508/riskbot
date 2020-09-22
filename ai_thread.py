@@ -26,8 +26,9 @@ class AiWorker(threading.Thread):
 
 
 class AiThread:
-    def __init__(self, ai, player_to_game_queue, game_to_player_queue):
+    def __init__(self, ai, player_to_game_queue, game_to_player_queue, name='AI'):
         self.type = 'ai_thread'
+        self.name = name
         self.game_to_player_queue = game_to_player_queue
 
         self.worker = AiWorker(ai, player_to_game_queue, game_to_player_queue)
